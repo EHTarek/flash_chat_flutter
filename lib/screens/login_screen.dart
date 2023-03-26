@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat_flutter/constants.dart';
+import 'package:flash_chat_flutter/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../components/rounded_button.dart';
@@ -13,6 +15,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+  late String email;
+  late String password;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Hero(
               tag: 'logo',
               child: Container(
-                height: 200.0,
+                height: 100.0,
                 child: Image.asset('images/logo.png'),
               ),
             ),
@@ -34,7 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               textAlign: TextAlign.center,
               keyboardType: TextInputType.emailAddress,
-              onChanged: (value) {},
+              onChanged: (value) {
+                email = value;
+              },
               decoration: kTextFieldDecoration.copyWith(
                 hintText: 'Enter your email',
               ),
@@ -43,14 +51,26 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               textAlign:TextAlign.center,
               obscureText: true,
-              onChanged: (value) {},
+              onChanged: (value) {
+                password = value;
+              },
               decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your password'),
             ),
             RoundedButton(
               title: 'Log In',
               color: Colors.lightBlueAccent,
-              onPressed: () {},
+              onPressed: () async{
+                try {
+                  final user = await _auth.signInWithEmailAndPassword(
+                      email: email, password: password);
+                  if(user != null){
+                    Navigator.pushNamed(context, ChatScreen.routes);
+                  }
+                }catch(e){
+                  print(e);
+                }
+              },
             ),
           ],
         ),
